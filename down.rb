@@ -25,18 +25,19 @@ class Downloader
   end
 
   def claim_result *args
-    if @result_processor
+    if @result_processor then
       @result_processor.call *args
+    end
   end
 
   def run
     EM.run do
-      @worknum.times do
-        start_worker
+      @worknum.times do |id|
+        start_worker id
       end
     end
   end
-
+  
   def get_url url
     f = Fiber.current
     http = EM::HttpRequest.new(url).get
@@ -44,15 +45,18 @@ class Downloader
     http.callback {f.resume http}
     return Fiber.yield
   end
-
+  
   private
-
-  def start_worker
+  
+  def start_worker id
     Fiber.new do
-      puts ':)'
       loop do
         if @queue.empty? then
           @workers << Fiber.current
+          if (@workers.size == @worknum) then
+            puts "finished #{Time.now}"
+            EM.stop
+          end
           Fiber.yield
         else
           node = @queue[0]
@@ -63,7 +67,7 @@ class Downloader
       end
     end.resume
   end
-
+  
   def visit_node node
     type = node[:type]
     url = node[:url]
@@ -90,4 +94,3 @@ class Downloader
   end
   
 end
-

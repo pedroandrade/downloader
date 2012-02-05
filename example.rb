@@ -24,14 +24,14 @@ d =   Downloader.new 'http://www.wolnelektury.pl/katalog/' do
   end
   
   traverse :result do |data, other|
-    claim_result({:text => data, :title => other[:title], :author => :other[:author]})
+    claim_result({:text => data.response, :title => other[:title], :author => other[:author]})
     []
   end
   
-  process_results do |data, other|
-    FileUtils.makedirs("stuff/#{other[:author]}/")
-    File.open("stuff/#{other[:author][0]}/#{other[:title][0]}.txt", "w") do |file|
-      file.puts data.response
+  process_results do |result|
+    FileUtils.makedirs("stuff/#{result[:author]}/")
+    File.open("stuff/#{result[:author]}/#{result[:title]}.txt", "w") do |file|
+      file.puts result[:text]
     end
   end
 end
