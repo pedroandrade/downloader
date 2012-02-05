@@ -1,2 +1,4 @@
 Downloader is a simple ruby library that helps you traverse web pages as a graph and analyse it.
 The library depends on EventMachine.
+
+example.rb contains example od usage
